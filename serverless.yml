@@ -3,10 +3,9 @@ app: aws-node-http-api-project
 service: aws-node-http-api-project
 frameworkVersion: '3'
 
-
 params:
   default:
-    dbName: alura_serverlss
+    dbName: cadastros
   dev:
     connectionString: mongodb://localhost:27017/${self:params.default.dbName}
     salt: SJxV9oNKRtEks8un3W3jUZSkHwrxBOdZ
@@ -34,7 +33,18 @@ functions:
           method: post
           request:
             schemas:
-              application/json: ${file(./schemas/sendResponse.json)}
+              application/json: ${file(./schemas/produtos.json)}
+
+  sendAcabamento:
+    handler: api/acabamentos/controllers/acabamento.sendAcabamento
+    events:
+      - httpApi:
+          path: /api/acabamentos/controllers/
+          method: post
+          request:
+            schemas:
+              application/json: ${file(./schemas/acabamentos.json)}
+
 
   getResult:
     handler: api/index.getResult
@@ -52,6 +62,21 @@ functions:
           request:
             schemas:
               application/json: ${file(./schemas/login.json)}
+              
+  getAllResults:
+    handler: api/index.getAllResults
+    events:
+      - httpApi:
+          path: /api/results
+          method: get
+
+  deletResult:
+    handler: api/index.deletResult
+    events:
+      - httpApi:
+          path: /api/results/{id}
+          method: delete
+
 
 plugins:
   - serverless-offline

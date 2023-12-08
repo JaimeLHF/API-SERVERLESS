@@ -16,7 +16,7 @@ async function connectDataBase() {
 async function saveResultsDataBase(result) {
 
     const client = await connectDataBase();
-    const collection = client.collection('results')
+    const collection = client.collection('produtos')
     const { insertedId } = await collection.insertOne(result)
 
     return insertedId
@@ -24,9 +24,33 @@ async function saveResultsDataBase(result) {
 
 async function getResultById(id) {
     const client = await connectDataBase();
-    const collection = client.collection('results')
+    const collection = client.collection('produtos')
 
     const result = await collection.findOne({
+        _id: new ObjectId(id)
+    })
+
+    if (!result) return null
+
+    return result
+}
+
+async function getResults() {
+    const client = await connectDataBase();
+    const collection = client.collection('produtos')
+
+    const results = await collection.find({}).toArray();
+
+    if (!results) return null
+
+    return results
+}
+
+async function deleteResultById(id) {
+    const client = await connectDataBase();
+    const collection = client.collection('produtos')
+
+    const result = await collection.deleteOne({
         _id: new ObjectId(id)
     })
 
@@ -50,5 +74,7 @@ async function getUserCredentials(username, password) {
 module.exports = {
     getUserCredentials,
     saveResultsDataBase,
-    getResultById
+    getResultById,
+    getResults,
+    deleteResultById
 }

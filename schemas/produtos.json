@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "properties": {
+        "sku": {
+            "type": "integer"
+        },
+        "produto": {
+            "type": "string"
+        },
+        "acabamento": {
+            "type": "string"
+        },
+        "pontuacao": {
+            "type": "integer"
+        },
+        "referencia_corte": {
+            "type": "string"
+        }
+       
+    },
+    "required": [
+        "sku",
+        "produto",
+        "acabamento",
+        "pontuacao",
+        "referencia_corte"       
+    ]
+}

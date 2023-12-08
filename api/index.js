@@ -1,9 +1,8 @@
 'use restrict'
 
 const { buildResponse } = require('./util')
-const { getUserCredentials, saveResultsDataBase, getResultById } = require('./database')
-const { authorize, createToken, makeHash } = require('./auth')
-const { countCorrectAnswers } = require('./responses')
+const { getUserCredentials, saveResultsDataBase, getResultById, getResults, deleteResultById } = require('./database')
+const { authorize, createToken, makeHash } = require('./auth/auth')
 
 function extractBody(event) {
   if (!event?.body) {
@@ -37,16 +36,15 @@ module.exports.sendResponse = async (event) => {
 
   if (authResult.statusCode === 401) return authResult
 
-  const { name, answers } = extractBody(event)
-  const result = countCorrectAnswers(name, answers)
+  const sku = extractBody(event)
 
-  const insertedId = await saveResultsDataBase(result)
+  const insertedId = await saveResultsDataBase(sku)
 
   return buildResponse(201, {
     resultId: insertedId,
     __hypermedia: {
       href: `/results.html`,
-      query: { id: insertedId }
+      query: { sku: sku }
     }
   })
 
@@ -67,3 +65,36 @@ module.exports.getResult = async (event) => {
   return buildResponse(202, result)
 
 }
+
+module.exports.deletResult = async (event) => {
+
+  const authResult = await authorize(event)
+
+  if (authResult.statusCode === 401) return authResult
+
+  const result = await deleteResultById(event.pathParameters.id)
+
+
+  if (!result) {
+    return buildResponse(404, { error: 'Result not found!' })
+  }
+  return buildResponse(202, "Item deletado com Sucesso!", result)
+
+}
+
+
+module.exports.getAllResults = async (event) => {
+
+  const authResult = await authorize(event)
+
+  if (authResult.statusCode === 401) return authResult
+
+  const results = await getResults(event)
+
+
+  if (!results) {
+    return buildResponse(404, { error: 'Result not found!' })
+  }
+  return buildResponse(202, results)
+
+};
